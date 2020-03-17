@@ -29,7 +29,7 @@ router.get('/api/current_user', (req, res) => {
     res.send(req.user);
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/api/signup', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     try {
@@ -42,7 +42,7 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
     if (!email || !password) {

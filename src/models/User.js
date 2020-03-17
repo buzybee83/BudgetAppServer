@@ -21,6 +21,15 @@ const userSchema = new Schema({
         required: true
     },
     googleId: String,
+    settings: {
+        notifications: {
+            isEnabled: Boolean,
+            alerts:[{
+                alertAhead: Number,
+                period: String
+            }]
+        }
+    }
 });
 
 userSchema.pre('save', function(next) {
