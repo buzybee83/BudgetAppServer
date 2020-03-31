@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const keys = require('./config/keys');
 const authRoutes = require('./routes/authRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
+const expenseRoutes = require('./routes/expenseRoutes');
 const requireAuth = require('./middlewares/requireAuth');
 
 const app = express();
@@ -16,6 +17,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(authRoutes);
 app.use(budgetRoutes);
+app.use(expenseRoutes);
 
 const mongoUri = keys.mongoURI;
 if (!mongoUri) {
@@ -23,14 +25,16 @@ if (!mongoUri) {
         `MongoURI was not supplied. Please check your settings!`
     );
 }
+
 mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
-});
-
-mongoose.connection.on('connected', () => { console.log('Connected to mongo instance!'); });
-mongoose.connection.on('error', (err) => { console.error('Error connecting to mongoDB: ', err); });
+    useUnifiedTopology: true,
+    useFindAndModify: false
+}).then(
+    () => { console.log('Connected to mongo instance!'); },
+    err => { console.error('Error connecting to mongoDB: ', err); }
+);
 
 app.get('/', requireAuth, (req, res) => {
     res.send(`Your email: ${req.user.email}`);

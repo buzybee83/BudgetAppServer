@@ -6,11 +6,11 @@ const monthlySchema = new mongoose.Schema({
     month: {
         name: {
             type: String,
-            default: Date.now.toLocaleString('default', { month: 'long' })
+            default: 'January'
         },
         year: {
             type: String,
-            default: Date.now.getFullYear
+            default: '2020'
         },
         isCurrentMonth: {
             type: Boolean,
@@ -19,8 +19,10 @@ const monthlySchema = new mongoose.Schema({
     },
     savings: [{
         amount: Number,
-        paycheckTag: String
+        tag: String
     }],
+    income: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Income' }],
+    expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Expense' }],
     totalIncome: Number,
     totalExpenses: Number,
     totalSavings: Number
@@ -29,13 +31,14 @@ const monthlySchema = new mongoose.Schema({
 const budgetSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        unique: true
     },
     projectedSavings: Number,
     monthlyBudget: [monthlySchema],
     settings: {
         firstPayDate: {
-            type: Date,
+            type: String,
             required: true
         },
         incomeType: {
@@ -58,20 +61,12 @@ const budgetSchema = new mongoose.Schema({
                 amount: Number,
                 amountType: {
                     type: String,
-                    default: '%'
+                    default: '$'
                 }
             }
         },
-    },
-    createdDate: {
-        type: Date,
-        default: Date.now
-    },
-    updatedDate: {
-        type: Date,
-        default: Date.now
     }
-});
+}, {timestamps: true});
 
 budgetSchema.methods.getTotalSavings = function (budgetId, callback) {
     const budget = this;
@@ -124,14 +119,13 @@ budgetSchema.methods.getTotalIncome = function () {
         console.log('Income AGGREGATE ERROR === ', err)
         console.log('Income AGGREGATE RESULTS === ', results)
     });
-
 }
 
-budgetSchema.methods.getTotalExpenses = function(monthTag) {
+budgetSchema.methods.getTotalExpenses = function(monthId, callback) {
     const budget = this;
 
     Expense.aggregate([{
-        $match: { $and: [{ budgetId: budget._id }, { monthTag: monthTag }] },
+        $match: { $and: [{ budgetId: budget._id }, { monthTag: monthId }] },
     }, {
         $group: {
             _id: null,

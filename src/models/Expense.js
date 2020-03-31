@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 
 const expenseSchema = new mongoose.Schema({
-    monthTag: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Month'
-    },
     budgetId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Budget'
+        ref: 'Budget',
+        required: true
+    },
+    name: {
+        type: String,
+        required: true,
     },
     dueDay: {
         type: Number,
@@ -32,18 +33,14 @@ const expenseSchema = new mongoose.Schema({
         type: String,
         default: 'A'
     },
-    split: {
+    isPaid: {
         type: Boolean,
         default: false
     },
-    createdDate: {
-        type: Date,
-        default: Date.now
-    },
-    updatedDate: {
-        type: Date,
-        default: Date.now
+    split: {
+        type: Boolean,
+        default: false
     }
-});
+}, {timestamps: true});
 
 mongoose.model('Expense', expenseSchema);
