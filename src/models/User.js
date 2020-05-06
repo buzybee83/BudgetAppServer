@@ -21,6 +21,7 @@ const userSchema = new Schema({
         required: true
     },
     googleId: String,
+    budget: { type: mongoose.Schema.Types.ObjectId, ref: 'Budget' },
     settings: {
         notifications: {
             isEnabled: Boolean,
@@ -30,7 +31,7 @@ const userSchema = new Schema({
             }]
         }
     }
-});
+}, {timestamps: true});
 
 userSchema.pre('save', function(next) {
     const user = this;

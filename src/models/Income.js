@@ -1,3 +1,11 @@
+/* 
+    VALUE ref
+    incomeType = {
+        1 : Paycheck
+        2 : Misc/One time
+    }
+*/
+
 const mongoose = require('mongoose');
 
 const incomeSchema = new mongoose.Schema({
@@ -16,7 +24,8 @@ const incomeSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true
-    }
+    },
+    tag: String
 }, {timestamps: true});
 
 mongoose.model('Income', incomeSchema);

@@ -36,7 +36,7 @@ router.post('/api/signup', async (req, res) => {
         const user = new User({ firstName, lastName, email, password });
         await user.save();
         const token = jwt.sign({ userId: user._id }, 'MY_SECRET_KEY');
-        res.send({ token, firstName, lastName });
+        res.send({ token, firstName, lastName, id: user._id, budget: user.budget  });
     } catch (err) {
         return res.status(422).send(err);
     }
@@ -56,9 +56,9 @@ router.post('/api/login', async (req, res) => {
     
     try {
         await user.comparePasswords(password);
-        const { firstName, lastName, _id } = user;
+        const { firstName, lastName, _id, budget } = user;
         const token = jwt.sign({ userId: user._id}, 'MY_SECRET_KEY');
-        res.send({ token, firstName, lastName, id: _id });
+        res.send({ token, firstName, lastName, id: _id, budget });
     } catch (err) {
         return res.status(404).send({ error: 'Invalid email or password.' });
     }

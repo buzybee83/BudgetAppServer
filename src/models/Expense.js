@@ -1,9 +1,24 @@
+/* 
+    VALUE ref
+    recurringType = {
+        1 : Once a Month
+        2 : Twice a Month
+        3 : Weekly
+        4 : Every Other Month
+    }
+*/
+
 const mongoose = require('mongoose');
 
 const expenseSchema = new mongoose.Schema({
     budgetId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Budget',
+        required: true
+    },
+    monthtId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Month',
         required: true
     },
     name: {
