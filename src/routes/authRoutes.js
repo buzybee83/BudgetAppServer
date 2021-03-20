@@ -30,35 +30,37 @@ router.get('/api/current_user', (req, res) => {
 });
 
 router.post('/api/signup', async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
-
+    const { firstName, lastName, password } = req.body;
+    const email = req.body.email.toLowerCase().trim();
+    
     try {
         const user = new User({ firstName, lastName, email, password });
         await user.save();
         const token = jwt.sign({ userId: user._id }, 'MY_SECRET_KEY');
-        res.send({ token, firstName, lastName, id: user._id, budget: user.budget  });
+        res.send({ token, firstName, lastName, id: user._id, budgetId: user.budgetId  });
     } catch (err) {
         return res.status(422).send(err);
     }
 });
 
 router.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
-    
+    const { password } = req.body;
+    const email = req.body.email.toLowerCase().trim();
+
     if (!email || !password) {
         return res.status(422).send({ error: 'Must provide email & password' });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne( { email });
     if (!user) {
         return res.status(404).send({ error: 'Invalid email or password.' });
     }
     
     try {
         await user.comparePasswords(password);
-        const { firstName, lastName, _id, budget } = user;
+        const { firstName, lastName, _id, budgetId } = user;
         const token = jwt.sign({ userId: user._id}, 'MY_SECRET_KEY');
-        res.send({ token, firstName, lastName, id: _id, budget });
+        res.send({ token, firstName, lastName, id: _id, budgetId });
     } catch (err) {
         return res.status(404).send({ error: 'Invalid email or password.' });
     }

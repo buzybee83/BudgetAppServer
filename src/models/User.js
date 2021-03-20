@@ -21,7 +21,7 @@ const userSchema = new Schema({
         required: true
     },
     googleId: String,
-    budget: { type: mongoose.Schema.Types.ObjectId, ref: 'Budget' },
+    budgetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Budget' },
     settings: {
         notifications: {
             isEnabled: Boolean,

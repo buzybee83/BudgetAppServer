@@ -20,35 +20,30 @@
             2: 'Percentage',
         };
 */
-
 const mongoose = require('mongoose');
 const Expense = mongoose.model('Expense');
 const Income = mongoose.model('Income');
 
 const monthlySchema = new mongoose.Schema({
 	month: {
-		name: {
-			type: String,
-			default: new Date().toLocaleString('default', { month: 'long' })
-		},
-		year: {
-			type: String,
-			default: new Date().getFullYear().toLocaleString()
-		},
-		isCurrentMonth: {
-			type: Boolean,
-			default: true
-		}
+		type: Date,
+		required: true
 	},
 	savings: [{
 		amount: Number,
-		paycheckTag: String
+		incomeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Income' }
 	}],
+	active: {
+		type: Boolean,
+		default: true,
+	},
 	income: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Income' }],
 	expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Expense' }],
 	totalIncome: Number,
 	totalExpenses: Number,
 });
+
+mongoose.model('Month', monthlySchema);
 
 const budgetSchema = new mongoose.Schema({
 	userId: {
@@ -67,13 +62,12 @@ const budgetSchema = new mongoose.Schema({
 				type: Number,
 				default: 2
 			},
-			employmentType: Number,
 			netAmount: Number
 		},
 		balanceThresholds: {
 			isEnabled: Boolean,
 			amount: Number,
-			thresholdType: Number
+			thresholdType: String // $ or %
 		},
 		savings: {
 			isEnabled: Boolean,
@@ -85,7 +79,7 @@ const budgetSchema = new mongoose.Schema({
 				amount: Number,
 				amountType: {
 					type: String,
-					default: '$'
+					default: '%'
 				}
 			}
 		},
@@ -112,7 +106,7 @@ budgetSchema.methods.getTotalSavings = function (budgetId, callback) {
 				}
 			}
 		],
-		function (err, results) {
+		(err, results) => {
 			console.log('AGGREGATE ERROR === ', err)
 			console.log('AGGREGATE RESULTS === ', results)
 		}
@@ -131,7 +125,7 @@ budgetSchema.methods.getTotalIncome = function () {
 	const end = new Date(year, month, 30);
 
 	Income.aggregate([{
-		$match: { $and: [{ budgetId: $budget._id }, { paydayDate: { $gte: start, $lt: end } }] },
+		$match: { $and: [{ budgetId: budget._id }, { paydayDate: { $gte: start, $lt: end } }] },
 	}, {
 		$group: {
 			_id: null,
@@ -159,6 +153,31 @@ budgetSchema.methods.getTotalExpenses = function (monthId, callback) {
 		}
 	}], callback);
 }
+
+// budgetSchema.methods.pop('findOne', async function() {
+// 	const budgetToUpdate = await this.model.findOne(this.getFilter());
+// 	console.log('budgetToUpdate >> ', budgetToUpdate)
+// 	// Checking current month view + add additional
+// 	let monthCount = 0; // We want 3 active months at all times
+// 	budgetToUpdate.monthlyBudget = budget.monthlyBudget.map(item => {
+// 		const today = new Date();
+// 		item.active = !(new Date(item.month).getMonth() < today.getMonth() && new Date(item.month).getFullYear() < today.getFullYear());
+// 		if (item.active) monthCount++
+// 		return item;
+// 	});
+	
+// 	if (monthCount < 3) {
+// 		while (monthCount < 3) {
+// 			const newMonth = budgetToUpdate.monthlyBudget[budgetToUpdate.monthlyBudget.length -1];
+// 			newMonth.active = true;
+// 			newMonth.month = newMonth.month.setMonth(newMonth.month.getMonth() + 1);
+// 			delete newMonth._id;
+// 			budgetToUpdate.monthlyBudget.push(newMonth);
+// 			monthCount++;
+// 		}
+// 	}
+// 	await budgetToUpdate.save();
+// });
 
 mongoose.model('Budget', budgetSchema);
 

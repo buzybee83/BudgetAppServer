@@ -1,46 +1,51 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const requireAuth = require('../middlewares/requireAuth');
-const budgetBuilder = require('../middlewares/budgetBuilder');
+const { BudgetCreator } = require('../middlewares/budgetBuilder');
 
 const User = mongoose.model('User');
 const Budget = mongoose.model('Budget');
 
 const router = express.Router();
 
-router.use(requireAuth)
+router.use(requireAuth);
 
 router.get('/api/budget', async (req, res) => {
-    console.log('REQUESTING BUDGET');
-    Budget.findById(req.user.budget).
-        populate({
-            path: 'monthlyBudget.expenses',
-            model: 'Expense'
-        }).
-        populate({
-            path: 'monthlyBudget.income',
-            model: 'Income'
-        }).
-        exec(function (err, budget) {
-            if (err) res.status(422).send({ error: err.message });
-
-            console.log('SENDING BUDGET', budget);
-            res.send(budget);
-        });
+    console.log('***REQUESTING BUDGET***', req.user);
+    const budgetId = req.user.budgetId;
+    try {
+        const budget = await Budget.findById(budgetId).exec();
+        budget.
+            populate({
+                path: 'monthlyBudget.expenses',
+                model: 'Expense'
+            }).
+            populate({
+                path: 'monthlyBudget.income',
+                model: 'Income'
+            }).
+            execPopulate();
+        console.log('SENDING BUDGET', budget);
+        res.send(budget);
+    }
+    catch (err) {
+        if (err) res.status(422).send({ error: err.message });
+    }
+            
 });
 
-router.post('/api/budget', budgetBuilder, async (req, res) => {
+router.post('/api/budget', BudgetCreator, async (req, res) => {
     console.log('BUDGET BUILT === ', req.body)
     const userQuery = { _id: req.user.id };
     try {
         const budget = new Budget(req.body);
         await budget.save();
         await User.findOneAndUpdate(userQuery,
-            { $set: { "budget": budget._id } }
+            { $set: { "budgetId": budget._id } }
         );
         res.send(budget);
     } catch (err) {
-        console.error(err)
+        console.error('Budget Creation has an error. ', err.message)
         res.status(422).send({ error: err.message });
     }
 });

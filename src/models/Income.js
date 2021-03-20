@@ -1,7 +1,7 @@
 /* 
     VALUE ref
     incomeType = {
-        1 : Paycheck
+        1 : Paycheck/Recurring
         2 : Misc/One time
     }
 */
@@ -12,6 +12,11 @@ const incomeSchema = new mongoose.Schema({
     budgetId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Budget'
+    },
+    monthId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Month',
+        required: true
     },
     paydayDate: {
         type: Date,
