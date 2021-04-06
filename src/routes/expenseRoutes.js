@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(requireAuth)
 
 router.get('/api/:budgetId/expenses', async (req, res) => {
-    console.log('###API REQUESTING EXPENSES###', req.user);
+    // console.log('###API REQUESTING EXPENSES###', req.user);
 
     try {
         const expenses = await Expense.find({ budgetId: req.params.budgetId });
@@ -21,18 +21,13 @@ router.get('/api/:budgetId/expenses', async (req, res) => {
 });
 
 router.post('/api/:budgetId/expense', async (req, res) => {
-    console.log('###API CREATING EXPENSE ### ', req.body);
+    console.log('###API CREATING EXPENSE ### ');
     
     const query = { _id: req.params.budgetId };
     try {
         // req.body.budgetId = req.params.budgetId;
         const expense = new Expense(req.body);
         await expense.save();
-        const budget = await Budget.findOne(query);
-        console.log('BUDGET>> ',budget)
-        // budget.expenses.push(expense._id);
-        // await budget.save();
-
         res.send(expense);
     } catch (err) {
         console.log('ERROR == ', err)
@@ -54,7 +49,7 @@ router.get('/api/:budgetId/expense/:id', async (req, res) => {
 });
 
 router.post('/api/:budgetId/expense/:id', async (req, res) => {
-    console.log('###API UPDATING EXPENSE BY ID### ', req.body);
+    console.log('###API UPDATING EXPENSE BY ID### ');
 
     const query = { _id: req.params.id, budgetId: req.params.budgetId };
     try {
@@ -64,7 +59,6 @@ router.post('/api/:budgetId/expense/:id', async (req, res) => {
                 { new: true } 
             );
         if (!expense) return res.status(404).send({ error: `Expense with ID: ${req.params.id} was not found.` });
-        
         res.send(expense);
     } catch(err) {
         res.status(500).send({ error: err.message });
@@ -77,6 +71,7 @@ router.post('/api/:budgetId/expenses:filter', async (req, res) => {
 });
 
 router.delete('/api/:budgetId/expense/:id', async (req, res) => {
+    console.log('DELETING EXPENSE W ID =', req.params.id)
     try {
         const expense = await Expense.findByIdAndDelete(req.params.id);
         if (!expense) return res.status(404).send({ error: `Expense with ID: ${req.params.id} was not found.` });

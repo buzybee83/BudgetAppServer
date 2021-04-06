@@ -11,7 +11,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 router.get('/api/budget', async (req, res) => {
-    console.log('***REQUESTING BUDGET***', req.user);
+    // console.log('***REQUESTING BUDGET***', req.user);
     const budgetId = req.user.budgetId;
     try {
         const budget = await Budget.findById(budgetId).exec();
@@ -25,7 +25,6 @@ router.get('/api/budget', async (req, res) => {
                 model: 'Income'
             }).
             execPopulate();
-        console.log('SENDING BUDGET', budget);
         res.send(budget);
     }
     catch (err) {
@@ -35,7 +34,7 @@ router.get('/api/budget', async (req, res) => {
 });
 
 router.post('/api/budget', BudgetCreator, async (req, res) => {
-    console.log('BUDGET BUILT === ', req.body)
+    // console.log('BUDGET BUILT === ', req.body)
     const userQuery = { _id: req.user.id };
     try {
         const budget = new Budget(req.body);
@@ -52,7 +51,6 @@ router.post('/api/budget', BudgetCreator, async (req, res) => {
 
 router.post('/api/budget/:id', async (req, res) => {
     const query = { _id: req.params.id, userId: req.user._id };
-    console.log('RECEIVED UPDATED BUDGET >> ', req.body)
 
     try {
         const budget = await Budget.

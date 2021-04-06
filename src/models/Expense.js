@@ -1,11 +1,6 @@
 /* 
     VALUE ref
-    recurringType = {
-        1 : Weekly
-        2 : Twice a Month
-        3 : Once a Month
-        4 : Every Other Month
-    }
+    recurringType = [Weekly,Twice a Month, Once a Month, Every Other Month]
 */
 const mongoose = require('mongoose');
 
@@ -18,6 +13,7 @@ const expenseSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        unique: true
     },
     dueDay: {
         type: Number,
@@ -34,13 +30,10 @@ const expenseSchema = new mongoose.Schema({
             default: true
         },
         recurringType: {
-            type: Number,
-            default: 3
+            type: String,
+            default: 'Once a Month',
+            enum: ['Weekly', 'Twice a Month', 'Once a Month', 'Every Other Month']
         }
-    },
-    status: {
-        type: String,
-        default: 'A'
     },
     isPaid: {
         type: Boolean,
@@ -49,7 +42,16 @@ const expenseSchema = new mongoose.Schema({
     split: {
         type: Boolean,
         default: false
-    }
+    },
+    fixedAmount: {
+        type: Boolean,
+        default: false
+    },
+    status: {
+        type: String,
+        default: 'A',
+        enum: ['A', 'D']
+    }    
 }, {timestamps: true});
 
 mongoose.model('Expense', expenseSchema);

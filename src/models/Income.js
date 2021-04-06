@@ -2,7 +2,7 @@
     VALUE ref
     incomeType = {
         1 : Paycheck/Recurring
-        2 : Misc/One time
+        0 : Misc/One time
     }
 */
 
@@ -11,26 +11,36 @@ const mongoose = require('mongoose');
 const incomeSchema = new mongoose.Schema({
     budgetId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Budget'
-    },
-    monthId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Month',
+        ref: 'Budget',
         required: true
     },
-    paydayDate: {
-        type: Date,
+    description: {
+        type: String,
         required: true
+    },
+    payday: {
+        type: Number,
+        require: true
+    },
+    isAutomated: {
+        type: Boolean,
+        default: true
+    },
+    status: {
+        type: String,
+        default: 'original',
+        enum: ['original', 'modified']
     },
     incomeType: {
         type: Number,
-        default: 1
+        default: 1,
+        enum: [0, 1]
     },
     amount: {
         type: Number,
         required: true
-    },
-    tag: String
+    }
+    
 }, {timestamps: true});
 
 mongoose.model('Income', incomeSchema);

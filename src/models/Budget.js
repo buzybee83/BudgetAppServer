@@ -3,22 +3,8 @@
     SETTINGS:  
         introFlow = 'SKIPPED', 'COMPLETE'
         Savings amountType = '$', '%'
-        payFrequency = {
-            0: Misc,
-            1: Weekly,
-            2: Bi-Weekly,
-            3: Semi-monthly,
-            4: Monthly,
-        }
-        employmentType = {
-            1: Hourly
-            2: Salary
-            3: Commission 
-        } 
-        balanceThresholds Type = {
-            1: 'Amount',
-            2: 'Percentage',
-        };
+        payFrequency = [Misc, Weekly, Bi-Weekly, Semi-monthly, Monthly]
+        balanceThresholds Type = [%, $]
 */
 const mongoose = require('mongoose');
 const Expense = mongoose.model('Expense');
@@ -56,18 +42,26 @@ const budgetSchema = new mongoose.Schema({
 	monthlyBudget: [monthlySchema],
 	settings: {
 		introStatus: String,
+		showPreview: {
+			type: Boolean,
+			default: true
+		},
 		firstPayDate: Date,
 		incomeType: {
 			payFrequency: {
-				type: Number,
-				default: 2
+				type: String,
+				default: 'Bi-Weekly',
+				emun: ['Misc', 'Weekly', 'Bi-Weekly', 'Semi-Monthly', 'Monthly']
 			},
 			netAmount: Number
 		},
 		balanceThresholds: {
 			isEnabled: Boolean,
 			amount: Number,
-			thresholdType: String // $ or %
+			thresholdType:{
+				type: String,
+				enum: ['$', '%']
+			}
 		},
 		savings: {
 			isEnabled: Boolean,
@@ -79,7 +73,8 @@ const budgetSchema = new mongoose.Schema({
 				amount: Number,
 				amountType: {
 					type: String,
-					default: '%'
+					default: '%',
+					emun: ['%', '$']
 				}
 			}
 		},

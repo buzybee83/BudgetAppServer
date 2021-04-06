@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const keys = require('./config/keys');
 const authRoutes = require('./routes/authRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
+const incomeRoutes = require('./routes/incomeRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const requireAuth = require('./middlewares/requireAuth');
 
@@ -17,6 +18,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(authRoutes);
 app.use(budgetRoutes);
+app.use(incomeRoutes);
 app.use(expenseRoutes);
 
 const mongoUri = keys.mongoURI;
